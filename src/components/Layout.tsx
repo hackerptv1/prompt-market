@@ -32,13 +32,23 @@ export function Layout() {
           <div className="flex h-16 items-center justify-between">
             <Logo />
 
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setIsMenuOpen(true)}
-              className="lg:hidden p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-50"
-            >
-              <Menu className="h-6 w-6" />
-            </button>
+            {/* Mobile navigation */}
+            <div className="lg:hidden flex items-center gap-2">
+              {!isAuthenticated && (
+                <Link 
+                  to="/auth" 
+                  className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                >
+                  Sign In
+                </Link>
+              )}
+              <button
+                onClick={() => setIsMenuOpen(true)}
+                className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-50"
+              >
+                <Menu className="h-6 w-6" />
+              </button>
+            </div>
 
             {/* Desktop navigation */}
             <div className="hidden lg:flex items-center gap-6">
