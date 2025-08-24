@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { X, Settings, LogOut, Calendar, User, Store, Home } from 'lucide-react';
+import { X, Settings, LogOut, Calendar, User, Store, Home, Search } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -81,7 +81,10 @@ export function MobileMenu({ isOpen, onClose, isActive }: MobileMenuProps) {
               className={`block px-4 py-3 rounded-lg hover:bg-gray-50 ${isActive('/browse')}`}
               onClick={onClose}
             >
-              Browse
+              <div className="flex items-center gap-3">
+                <Search className="h-5 w-5" />
+                Browse
+              </div>
             </Link>
 
             {/* Protected routes - visible to all but redirect non-logged-in users */}
@@ -100,11 +103,13 @@ export function MobileMenu({ isOpen, onClose, isActive }: MobileMenuProps) {
                 </Link>
                 <Link
                   to="/consultations"
-                  className={`${isActive('/consultations')} flex items-center gap-2 px-3 py-2 text-base font-medium rounded-md transition-colors`}
+                  className={`block px-4 py-3 rounded-lg hover:bg-gray-50 ${isActive('/consultations')}`}
                   onClick={onClose}
                 >
-                  <Calendar className="h-5 w-5" />
-                  {user.role === 'seller' ? 'My Bookings' : 'My Consultations'}
+                  <div className="flex items-center gap-3">
+                    <Calendar className="h-5 w-5" />
+                    {user.role === 'seller' ? 'My Bookings' : 'My Consultations'}
+                  </div>
                 </Link>
                 {user.role === 'seller' && (
                   <>
