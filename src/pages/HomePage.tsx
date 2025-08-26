@@ -4,6 +4,7 @@ import { CategoryList } from '../components/CategoryList';
 import { CategoryPrompts } from '../components/home/CategoryPrompts';
 import { PopularAIs } from '../components/home/PopularAIs';
 import { Testimonials } from '../components/home/Testimonials';
+import { InfoSection } from '../components/home/InfoSection';
 
 // Mock data for category prompts
 const instagramPrompts = [
@@ -320,10 +321,14 @@ export function HomePage() {
       <Hero />
       <CategoryList />
       <CategoryPrompts title="Instagram Reel Creation" prompts={instagramPrompts} />
+      <InfoSection variant="features" />
       <CategoryPrompts title="Website Development" prompts={websitePrompts} />
+      <InfoSection variant="benefits" />
       <PopularAIs />
       <CategoryPrompts title="Digital Art & Design" prompts={artPrompts} />
+      <InfoSection variant="how-it-works" />
       <CategoryPrompts title="Marketing & Advertising" prompts={marketingPrompts} />
+      <InfoSection variant="trust" />
       <Testimonials />
     </>
   );

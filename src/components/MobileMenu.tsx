@@ -221,6 +221,14 @@ export function MobileMenu({ isOpen, onClose, isActive }: MobileMenuProps) {
             // Sign in/Sign up for non-logged-in users
             <div className="mt-4 pt-4 border-t border-gray-100 space-y-1">
               <Link
+                to="/browse"
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-50"
+                onClick={onClose}
+              >
+                <Search className="h-5 w-5" />
+                Browse Prompts
+              </Link>
+              <Link
                 to="/auth"
                 className="flex items-center gap-3 px-4 py-3 text-blue-600 hover:text-blue-700 rounded-lg hover:bg-blue-50"
                 onClick={onClose}

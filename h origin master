@@ -1,0 +1,3 @@
+[33mffea7a7[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m fix: Add Search icon to Browse option and fix Consultations styling for consistent alignment
+[33m96471d5[m[33m ([m[1;31morigin/master[m[33m)[m feat: Add all menu options for non-logged-in users in mobile menu with sign-in redirects
+[33m03c5b76[m Add mobile Sign In button to header
