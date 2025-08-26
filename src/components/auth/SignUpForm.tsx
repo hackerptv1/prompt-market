@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import type { UserRole } from '../../pages/AuthPage';
 import { SocialButton } from './SocialButton';
 import { supabase } from '../../utils/supabase';
+import { buildOAuthRedirectUrl } from '../../utils/oauthUtils';
 
 interface SignUpFormProps {
   role: UserRole;
@@ -138,19 +139,24 @@ export function SignUpForm({ role, onModeChange }: SignUpFormProps) {
 
   const handleGoogleSignUp = async () => {
     try {
-      setError(null);
       setIsLoading(true);
-      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/google/callback?role=${role || 'buyer'}&mode=signup`
-        }
+          redirectTo: buildOAuthRedirectUrl('/auth/google/callback', {
+            role: role || 'buyer',
+            mode: 'signup'
+          }),
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
       });
 
       if (error) {
         console.error('Error signing up with Google:', error);
-        setError(error.message);
+        setError('Failed to sign up with Google. Please try again.');
       }
     } catch (error) {
       console.error('Error signing up with Google:', error);
@@ -161,16 +167,27 @@ export function SignUpForm({ role, onModeChange }: SignUpFormProps) {
   };
 
   const handleGithubSignUp = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'github',
-      options: {
-        redirectTo: `${window.location.origin}/auth/google/callback?role=${role || 'buyer'}&mode=signup`
-      }
-    });
+    try {
+      setIsLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: buildOAuthRedirectUrl('/auth/google/callback', {
+            role: role || 'buyer',
+            mode: 'signup'
+          })
+        }
+      });
 
-    if (error) {
+      if (error) {
+        console.error('Error signing up with GitHub:', error);
+        setError('Failed to sign up with GitHub. Please try again.');
+      }
+    } catch (error) {
       console.error('Error signing up with GitHub:', error);
-      setError(error.message);
+      setError('Failed to sign up with GitHub. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
