@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Sparkles, Users, Shield, Zap, Star, TrendingUp } from 'lucide-react';
 
 interface InfoSectionProps {
@@ -6,6 +6,27 @@ interface InfoSectionProps {
 }
 
 export function InfoSection({ variant }: InfoSectionProps) {
+  const [isVisible, setIsVisible] = useState(false);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.2, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   const sections = {
     features: {
       title: "Why Choose PromptMarket?",
@@ -96,21 +117,64 @@ export function InfoSection({ variant }: InfoSectionProps) {
   const section = sections[variant];
 
   return (
-    <div className="py-16 bg-gray-50">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
+    <div 
+      ref={sectionRef} 
+      className={`py-16 bg-gray-50 relative overflow-hidden transition-all duration-1000 ${
+        isVisible ? 'info-section-slide-up' : 'opacity-0 translate-y-20'
+      }`}
+    >
+      {/* Background gradient effect */}
+      <div className={`absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-indigo-50/30 transition-all duration-1000 ${
+        isVisible ? 'opacity-100' : 'opacity-0'
+      }`}></div>
+      
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className={`text-center mb-12 transition-all duration-800 delay-300 ${
+          isVisible ? 'info-section-fade-in' : 'opacity-0 translate-y-10'
+        }`}>
           <h2 className="text-3xl font-bold text-gray-900 mb-4">{section.title}</h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">{section.subtitle}</p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {section.items.map((item, index) => (
-            <div key={index} className="text-center">
-              <div className="flex justify-center mb-4">
+            <div 
+              key={index} 
+              className={`text-center p-6 rounded-xl transition-all duration-700 cursor-pointer info-card-hover ${
+                isVisible 
+                  ? `info-section-scale-in stagger-${index + 2}` 
+                  : 'opacity-0 translate-y-10'
+              } ${
+                hoveredIndex === index 
+                  ? 'transform scale-105 shadow-2xl bg-white border-2 border-blue-200 info-section-pulse' 
+                  : 'bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl border border-transparent hover:border-blue-100'
+              }`}
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
+              style={{
+                animationDelay: isVisible ? `${0.5 + index * 0.2}s` : '0s'
+              }}
+            >
+              <div className={`flex justify-center mb-4 transition-all duration-300 icon-bounce ${
+                hoveredIndex === index ? 'transform scale-110 info-section-float' : ''
+              }`}>
                 {item.icon}
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">{item.title}</h3>
-              <p className="text-gray-600 leading-relaxed">{item.description}</p>
+              <h3 className={`text-xl font-semibold mb-3 transition-all duration-300 ${
+                hoveredIndex === index ? 'text-blue-600' : 'text-gray-900'
+              }`}>
+                {item.title}
+              </h3>
+              <p className={`leading-relaxed transition-all duration-300 ${
+                hoveredIndex === index ? 'text-gray-700 font-medium' : 'text-gray-600'
+              }`}>
+                {item.description}
+              </p>
+              
+              {/* Hover glow effect */}
+              {hoveredIndex === index && (
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 rounded-xl opacity-0 animate-pulse pointer-events-none"></div>
+              )}
             </div>
           ))}
         </div>
