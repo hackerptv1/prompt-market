@@ -37,10 +37,9 @@ export function Layout() {
               {isAuthenticated && (
                 <Link 
                   to="/browse" 
-                  className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                  className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <Search className="h-4 w-4 mr-1" />
-                  Browse
+                  <Search className="h-6 w-6" />
                 </Link>
               )}
               {!isAuthenticated && (
