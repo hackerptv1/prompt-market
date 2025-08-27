@@ -132,8 +132,30 @@ export function Layout() {
 
       <footer className="bg-white border-t border-gray-100 py-8 md:py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center text-gray-500">
-            <p>© 2024 PromptMarket. All rights reserved.</p>
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="text-gray-500 mb-4 md:mb-0">
+              <p>© 2024 PromptMarket. All rights reserved.</p>
+            </div>
+            <div className="flex items-center space-x-6">
+              <Link 
+                to="/about" 
+                className="text-gray-500 hover:text-blue-600 transition-colors font-medium"
+              >
+                About Us
+              </Link>
+              <a 
+                href="#" 
+                className="text-gray-500 hover:text-blue-600 transition-colors font-medium"
+              >
+                Privacy Policy
+              </a>
+              <a 
+                href="#" 
+                className="text-gray-500 hover:text-blue-600 transition-colors font-medium"
+              >
+                Terms of Service
+              </a>
+            </div>
           </div>
         </div>
       </footer>

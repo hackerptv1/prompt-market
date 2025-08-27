@@ -2,88 +2,12 @@ import React from 'react';
 import { Hero } from '../components/Hero';
 import { CategoryList } from '../components/CategoryList';
 import { CategoryPrompts } from '../components/home/CategoryPrompts';
+import { CategoryPromptsReal } from '../components/home/CategoryPromptsReal';
 import { PopularAIs } from '../components/home/PopularAIs';
 import { Testimonials } from '../components/home/Testimonials';
 import { InfoSection } from '../components/home/InfoSection';
 
-// Mock data for category prompts
-const instagramPrompts = [
-  {
-    id: '1',
-    title: 'Viral Reel Script Generator',
-    description: 'Create engaging scripts for Instagram Reels that go viral.',
-    requirements: 'Basic understanding of Instagram Reels and content creation',
-    price: 19.99,
-    category: ['Social Media'],
-    rating: 4.9,
-    sales: 850,
-    thumbnail: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=800&h=400&fit=crop',
-    author: {
-      id: '15309dce-f734-4df1-b871-cdddb7bb0792',
-      name: 'SellerAcc',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
-    },
-    platform: {
-      name: 'ChatGPT',
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg',
-      type: 'ai' as const,
-    },
-    createdAt: '2024-03-15',
-    aiRunningCost: 0.02,
-    estimatedRunTime: '2-3 minutes',
-    productType: 'prompt'
-  },
-  {
-    id: '2',
-    title: 'Instagram Story Template Pack',
-    description: 'Professional story templates that boost engagement.',
-    requirements: 'Instagram account and basic design knowledge',
-    price: 24.99,
-    category: ['Social Media'],
-    rating: 4.7,
-    sales: 620,
-    thumbnail: 'https://images.unsplash.com/photo-1611162618071-b39a2ec055fb?w=800&h=400&fit=crop',
-    author: {
-      id: '98ab1c97-bf7c-4533-b7f6-7dc4d42bbe39',
-      name: 'Rasim Mammadov',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop',
-    },
-    platform: {
-      name: 'Midjourney',
-      logo: 'https://seeklogo.com/images/M/midjourney-logo-02E160DA6E-seeklogo.com.png',
-      type: 'ai' as const,
-    },
-    createdAt: '2024-03-14',
-    aiRunningCost: 0.03,
-    estimatedRunTime: '5-7 minutes',
-    productType: 'prompt'
-  },
-  {
-    id: '3',
-    title: 'Carousel Post Creator',
-    description: 'Generate swipeable carousel posts that convert.',
-    requirements: 'Instagram business account and content planning skills',
-    price: 29.99,
-    category: ['Social Media'],
-    rating: 4.8,
-    sales: 750,
-    thumbnail: 'https://images.unsplash.com/photo-1611162618479-ee4d1e0e5d48?w=800&h=400&fit=crop',
-    author: {
-      id: 'ed8ecb1e-8a1c-4c9f-9443-9fba0f7203b2',
-      name: 'testseller',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop',
-    },
-    platform: {
-      name: 'DALL-E',
-      logo: 'https://seeklogo.com/images/D/dall-e-logo-1DD62F0D6C-seeklogo.com.png',
-      type: 'ai' as const,
-    },
-    createdAt: '2024-03-13',
-    aiRunningCost: 0.04,
-    estimatedRunTime: '3-4 minutes',
-    productType: 'prompt'
-  }
-];
+// Mock data for other category prompts (keeping these for now)
 
 const websitePrompts = [
   {
@@ -320,7 +244,7 @@ export function HomePage() {
     <>
       <Hero />
       <CategoryList />
-      <CategoryPrompts title="Instagram Reel Creation" prompts={instagramPrompts} />
+      <CategoryPromptsReal title="Instagram Reel Creation" categoryName="Instagram Reel Creation" limit={3} />
       <InfoSection variant="features" />
       <CategoryPrompts title="Website Development" prompts={websitePrompts} />
       <InfoSection variant="benefits" />

@@ -11,6 +11,7 @@ import { ConsultationsPage } from './pages/ConsultationsPage';
 import { AuthPage } from './pages/AuthPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { AdminPage } from './pages/AdminPage';
+import { AboutUsPage } from './pages/AboutUsPage';
 import { SellersPage } from './components/admin/sellers/SellersPage';
 import { PromptsPage } from './components/admin/prompts/PromptsPage';
 import { UsersPage } from './components/admin/users/UsersPage';
@@ -37,7 +38,8 @@ import GoogleOAuthCallback from './components/auth/GoogleOAuthCallback';
 import { 
   BuyerRoute, 
   SellerRoute, 
-  AuthenticatedRoute 
+  AuthenticatedRoute,
+  AdminRoute
 } from './components/auth/ProtectedRoute';
 import { CatchAllRoute } from './components/auth/CatchAllRoute';
 
@@ -58,8 +60,12 @@ export default function App() {
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/auth/google/callback" element={<GoogleOAuthCallback />} />
                 
-                {/* Admin routes - unprotected */}
-                <Route path="/admin" element={<AdminPage />}>
+                {/* Admin routes - protected */}
+                <Route path="/admin" element={
+                  <AdminRoute>
+                    <AdminPage />
+                  </AdminRoute>
+                }>
                   <Route path="ai-logos" element={<SuperAdminLogos />} />
                   <Route path="platforms" element={<PlatformsPage />} />
                   <Route path="sellers" element={<SellersPage />} />
@@ -84,6 +90,7 @@ export default function App() {
                   {/* Public routes */}
                   <Route index element={<HomePage />} />
                   <Route path="browse" element={<BrowsePrompts />} />
+                  <Route path="about" element={<AboutUsPage />} />
                   <Route path="prompt/:id" element={<PromptDetailsPage />} />
                   
                   {/* Seller routes - protected with seller role */}

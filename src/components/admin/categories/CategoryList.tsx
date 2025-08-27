@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Edit2, Trash2, GripVertical, Plus } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import { AdminModal } from './AdminModal';
+import { useAuth } from '../../../contexts/AuthContext';
 
 // Define Category type
 interface Category {
@@ -12,6 +13,7 @@ interface Category {
 }
 
 export function CategoryList() {
+  const { user } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -142,6 +144,17 @@ export function CategoryList() {
 
   return (
     <div className="bg-white rounded-lg shadow-sm">
+      {/* Temporary Auth Debug Display */}
+      <div className="p-4 bg-yellow-50 border-b border-yellow-200">
+        <h3 className="text-sm font-medium text-yellow-800 mb-2">🔐 Authentication Status (Debug)</h3>
+        <div className="text-xs text-yellow-700 space-y-1">
+          <div>User: {user ? '✅ Logged In' : '❌ Not Logged In'}</div>
+          <div>Role: {user?.role || 'None'}</div>
+          <div>User ID: {user?.id || 'None'}</div>
+          <div>Email: {user?.email || 'None'}</div>
+        </div>
+      </div>
+      
       <div className="p-6 border-b border-gray-200 flex items-center justify-between">
         <h2 className="text-lg font-semibold">Main Categories</h2>
         <button
