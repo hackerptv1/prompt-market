@@ -22,16 +22,42 @@ export function CategoryPromptsReal({ title, categoryName, limit = 3 }: Category
         setLoading(true);
         setError(null);
 
-        // Fetch prompts for this category directly (category is an array field)
-        const { data: promptsData, error: promptsError } = await supabase
+        // First, get the category UUID from the categories table
+        console.log('Fetching category UUID for:', categoryName);
+        const { data: categoryData, error: categoryError } = await supabase
+          .from('categories')
+          .select('id')
+          .eq('name', categoryName)
+          .single();
+
+        if (categoryError) {
+          console.error('Error fetching category:', categoryError);
+          console.log('Category not found, showing empty state');
+          setPrompts([]);
+          setLoading(false);
+          return;
+        }
+
+        if (!categoryData) {
+          console.log('Category not found:', categoryName);
+          setPrompts([]);
+          setLoading(false);
+          return;
+        }
+
+        console.log('Found category UUID:', categoryData.id);
+        
+        // Now fetch prompts using the category UUID (category is an array field)
+        let { data: promptsData, error: promptsError } = await supabase
           .from('prompts')
           .select('*')
-          .contains('category', [categoryName])
+          .contains('category', [categoryData.id])
           .order('created_at', { ascending: false })
           .limit(limit);
 
         if (promptsError) {
           console.error('Error fetching prompts:', promptsError);
+          console.error('Category name:', categoryName);
           setError('Failed to load prompts');
           return;
         }
