@@ -57,6 +57,44 @@ export function CategoryPromptsReal({ title, categoryName, limit = 3 }: Category
 
         if (promptsError) {
           console.error('Error fetching prompts:', promptsError);
+          setError('Failed to load prompts');
+          return;
+        }
+
+        if (!promptsData) {
+          setPrompts([]);
+          setLoading(false);
+          return;
+        }
+
+        // Get all unique seller_ids from promptsData
+        const sellerIds = Array.from(new Set(promptsData.map(p => p.seller_id).filter(Boolean)));
+        let sellerProfiles: Record<string, { full_name: string | null; display_name: string | null; profile_picture_url: string | null }> = {};
+        
+        if (sellerIds.length > 0) {
+          console.log('Fetching seller profiles for IDs:', sellerIds);
+          const { data: profilesData, error: profilesError } = await supabase
+            .from('profiles')
+            .select('id, full_name, display_name, profile_picture_url')
+            .in('id', sellerIds);
+          
+          if (profilesError) {
+            console.error('Error fetching seller profiles:', profilesError);
+            // Continue without seller profiles - use defaults
+          } else if (profilesData) {
+            profilesData.forEach((profile: any) => {
+              sellerProfiles[profile.id] = {
+                full_name: profile.full_name,
+                display_name: profile.display_name,
+                profile_picture_url: profile.profile_picture_url,
+              };
+            });
+            console.log('Found seller profiles:', Object.keys(sellerProfiles));
+          }
+        }
+
+        if (promptsError) {
+          console.error('Error fetching prompts:', promptsError);
           console.error('Category name:', categoryName);
           setError('Failed to load prompts');
           return;
@@ -68,31 +106,34 @@ export function CategoryPromptsReal({ title, categoryName, limit = 3 }: Category
         }
 
         // Transform the data to match our Prompt interface
-        const transformedPrompts = promptsData.map((prompt: any) => ({
-          id: prompt.id,
-          title: prompt.title,
-          description: prompt.description,
-          requirements: prompt.requirements || '',
-          price: prompt.price,
-          category: [categoryName], // We know the category name
-          rating: prompt.average_rating || 4.5,
-          sales: prompt.total_sales || 0,
-          thumbnail: prompt.media_urls?.[0] || 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=400&fit=crop',
-          author: {
-            id: prompt.seller_id,
-            name: 'Seller', // We'll need to fetch seller details if needed
-            avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
-          },
-          platform: {
-            name: prompt.ai_platform || 'ChatGPT',
-            logo: 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg',
-            type: 'ai' as const,
-          },
-          createdAt: prompt.created_at,
-          aiRunningCost: prompt.ai_running_cost || 0.02,
-          estimatedRunTime: prompt.estimated_run_time || '2-3 minutes',
-          productType: prompt.product_type || 'prompt'
-        }));
+        const transformedPrompts = promptsData.map((prompt: any) => {
+          const sellerProfile = sellerProfiles[prompt.seller_id];
+          return {
+            id: prompt.id,
+            title: prompt.title,
+            description: prompt.description,
+            requirements: prompt.requirements || '',
+            price: prompt.price,
+            category: [categoryName], // We know the category name
+            rating: prompt.average_rating || 4.5,
+            sales: prompt.total_sales || 0,
+            thumbnail: prompt.media_urls?.[0] || 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=400&fit=crop',
+            author: {
+              id: prompt.seller_id,
+              name: sellerProfile?.display_name || sellerProfile?.full_name || `Seller ${prompt.seller_id?.slice(0, 8)}`,
+              avatar: sellerProfile?.profile_picture_url || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
+            },
+            platform: {
+              name: prompt.ai_platform || 'ChatGPT',
+              logo: 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg',
+              type: 'ai' as const,
+            },
+            createdAt: prompt.created_at,
+            aiRunningCost: prompt.ai_running_cost || 0.02,
+            estimatedRunTime: prompt.estimated_run_time || '2-3 minutes',
+            productType: prompt.product_type || 'prompt'
+          };
+        });
 
         setPrompts(transformedPrompts);
       } catch (err) {
