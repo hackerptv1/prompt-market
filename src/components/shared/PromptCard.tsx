@@ -181,7 +181,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
 
   return (
     <div className="group">
-      <div className="bg-white border border-gray-200 group-hover:shadow-lg transition-all duration-200">
+      <div className="bg-white border border-gray-200 group-hover:shadow-lg transition-all duration-200 rounded-xl overflow-hidden">
         <Link to={`/prompt/${prompt.id}`}>
           {/* Thumbnail or Media Preview */}
           <div className="relative aspect-video bg-gray-100 overflow-hidden">
