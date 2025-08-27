@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Menu, Calendar } from 'lucide-react';
+import { Menu, Calendar, Search } from 'lucide-react';
 import { Logo } from './Logo';
 import { UserMenu } from './UserMenu';
 import { MobileMenu } from './MobileMenu';
@@ -34,6 +34,15 @@ export function Layout() {
 
             {/* Mobile navigation */}
             <div className="lg:hidden flex items-center gap-2">
+              {isAuthenticated && (
+                <Link 
+                  to="/browse" 
+                  className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                >
+                  <Search className="h-4 w-4 mr-1" />
+                  Browse
+                </Link>
+              )}
               {!isAuthenticated && (
                 <Link 
                   to="/auth" 
