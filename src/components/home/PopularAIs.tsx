@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const popularAIs = [
   {
@@ -9,31 +9,62 @@ const popularAIs = [
   {
     id: 'midjourney',
     name: 'Midjourney',
-    logo: 'https://seeklogo.com/images/M/midjourney-logo-02E160DA6E-seeklogo.com.png'
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Midjourney_Emblem.png/1200px-Midjourney_Emblem.png'
   },
   {
     id: 'dalle',
     name: 'DALL-E',
-    logo: 'https://seeklogo.com/images/D/dall-e-logo-1DD62F0D6C-seeklogo.com.png'
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/DALL-E_2_logo.svg/1200px-DALL-E_2_logo.svg.png'
   },
   {
     id: 'stable-diffusion',
     name: 'Stable Diffusion',
-    logo: 'https://seeklogo.com/images/S/stable-diffusion-logo-C2BA8B27AD-seeklogo.com.png'
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Stability_AI_logo.svg/1200px-Stability_AI_logo.svg.png'
   },
   {
     id: 'claude',
     name: 'Claude',
-    logo: 'https://seeklogo.com/images/A/anthropic-claude-logo-7ABEA5C5A9-seeklogo.com.png'
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Anthropic_logo.svg/1200px-Anthropic_logo.svg.png'
   },
   {
     id: 'gemini',
     name: 'Gemini',
-    logo: 'https://seeklogo.com/images/G/google-gemini-logo-A5787B2669-seeklogo.com.png'
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Google_AI_Logo.svg/1200px-Google_AI_Logo.svg.png'
   }
 ];
 
 export function PopularAIs() {
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+
+  const handleImageError = (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const img = event.target as HTMLImageElement;
+    const platformName = img.alt || 'Unknown';
+    console.log('Image failed to load:', img.src, 'for platform:', platformName);
+    
+    setFailedImages(prev => new Set(prev).add(platformName));
+  };
+
+  const renderPlatformIcon = (ai: typeof popularAIs[0]) => {
+    const hasFailed = failedImages.has(ai.name);
+    
+    if (hasFailed) {
+      return (
+        <div className="fallback-icon h-24 w-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mb-4 text-white font-bold text-lg shadow-lg">
+          {ai.name.charAt(0)}
+        </div>
+      );
+    }
+
+    return (
+      <img
+        src={ai.logo}
+        alt={ai.name}
+        className="h-24 w-24 object-contain mb-4"
+        onError={handleImageError}
+      />
+    );
+  };
+
   return (
     <div className="bg-gray-50 py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -45,11 +76,7 @@ export function PopularAIs() {
             {popularAIs.map((ai) => (
               <div key={ai.id} className="flex-none w-48">
                 <div className="flex flex-col items-center">
-                  <img
-                    src={ai.logo}
-                    alt={ai.name}
-                    className="h-24 w-24 object-contain mb-4"
-                  />
+                  {renderPlatformIcon(ai)}
                   <h3 className="text-lg font-semibold text-gray-900">
                     {ai.name}
                   </h3>
@@ -60,11 +87,7 @@ export function PopularAIs() {
             {popularAIs.map((ai) => (
               <div key={`${ai.id}-duplicate`} className="flex-none w-48">
                 <div className="flex flex-col items-center">
-                  <img
-                    src={ai.logo}
-                    alt={ai.name}
-                    className="h-24 w-24 object-contain mb-4"
-                  />
+                  {renderPlatformIcon(ai)}
                   <h3 className="text-lg font-semibold text-gray-900">
                     {ai.name}
                   </h3>
