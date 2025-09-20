@@ -12,7 +12,7 @@ interface PromptPaymentFormProps {
     aiPlatform: string;
     productType: string;
   };
-  onPaymentSuccess: () => void;
+  onPaymentSuccess: (orderID: string) => void;
   onPaymentError: (error: string) => void;
   onCancel: () => void;
   disabled?: boolean;
@@ -41,8 +41,8 @@ export function PromptPaymentForm({
     setPaymentError(null);
     
     try {
-      // Payment was successful, call the parent success handler
-      onPaymentSuccess();
+      // Payment was successful, call the parent success handler with order ID
+      onPaymentSuccess(orderID);
     } catch (error) {
       console.error('Payment success handling error:', error);
       setPaymentError('Payment completed but there was an issue processing your purchase. Please contact support.');
@@ -59,10 +59,15 @@ export function PromptPaymentForm({
   };
 
   const paypalOptions = {
-    clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID ?? 'test',
+    clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID || '',
     currency: 'USD',
     intent: 'capture' as const,
   };
+
+  // Check if PayPal is properly configured
+  const isPayPalConfigured = import.meta.env.VITE_PAYPAL_CLIENT_ID && 
+    import.meta.env.VITE_PAYPAL_CLIENT_ID !== 'test' &&
+    import.meta.env.VITE_PAYPAL_CLIENT_ID.length > 0;
 
   return (
     <div className="max-w-md mx-auto">
@@ -97,44 +102,53 @@ export function PromptPaymentForm({
         )}
 
         {/* PayPal Buttons */}
-        <PayPalScriptProvider options={paypalOptions}>
-          <PayPalButtons
-            style={{ layout: 'vertical' }}
-            createOrder={async (data, actions) => {
-              try {
-                const orderID = await createPromptPayment(amount, promptDetails);
-                if (!orderID) {
-                  throw new Error('Failed to create payment order');
+        {isPayPalConfigured ? (
+          <PayPalScriptProvider options={paypalOptions}>
+            <PayPalButtons
+              style={{ layout: 'vertical' }}
+              createOrder={async (data, actions) => {
+                try {
+                  const orderID = await createPromptPayment(amount, promptDetails);
+                  if (!orderID) {
+                    throw new Error('Failed to create payment order');
+                  }
+                  return orderID;
+                } catch (error) {
+                  console.error('Error creating order:', error);
+                  throw error;
                 }
-                return orderID;
-              } catch (error) {
-                console.error('Error creating order:', error);
-                throw error;
-              }
-            }}
-            onApprove={async (data, actions) => {
-              try {
-                // Capture the order
-                const order = await actions.order?.capture();
-                if (order?.status === 'COMPLETED' && order.id) {
-                  await handlePaymentSuccess(order.id);
-                } else {
-                  throw new Error('Payment was not completed');
+              }}
+              onApprove={async (data, actions) => {
+                try {
+                  // Capture the order
+                  const order = await actions.order?.capture();
+                  if (order?.status === 'COMPLETED' && order.id) {
+                    await handlePaymentSuccess(order.id);
+                  } else {
+                    throw new Error('Payment was not completed');
+                  }
+                } catch (error) {
+                  console.error('Payment capture error:', error);
+                  handlePaymentError(error);
                 }
-              } catch (error) {
-                console.error('Payment capture error:', error);
-                handlePaymentError(error);
-              }
-            }}
-            onError={(err) => {
-              handlePaymentError(err);
-            }}
-            onCancel={() => {
-              onCancel();
-            }}
-            disabled={disabled || isProcessing}
-          />
-        </PayPalScriptProvider>
+              }}
+              onError={(err) => {
+                handlePaymentError(err);
+              }}
+              onCancel={() => {
+                onCancel();
+              }}
+              disabled={disabled || isProcessing}
+            />
+          </PayPalScriptProvider>
+        ) : (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
+            <div className="text-yellow-800 font-medium mb-2">Payment System Not Configured</div>
+            <div className="text-yellow-700 text-sm">
+              PayPal payment processing is not yet set up. Please contact the seller directly or try again later.
+            </div>
+          </div>
+        )}
 
         {/* Action Buttons */}
         <div className="flex gap-3">

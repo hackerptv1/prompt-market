@@ -45,7 +45,7 @@ export function PromptPurchaseModal({
 
   if (!isOpen) return null;
 
-  const handlePaymentSuccess = async () => {
+  const handlePaymentSuccess = async (orderID?: string) => {
     if (!user) return;
 
     setIsPaymentProcessing(true);
@@ -53,7 +53,12 @@ export function PromptPurchaseModal({
     try {
       console.log('Payment successful, creating purchase record for prompt:', prompt.id);
 
-      // Create the prompt purchase record
+      // SECURITY: Only create purchase record if we have a valid PayPal order ID
+      if (!orderID) {
+        throw new Error('Invalid payment: No order ID provided');
+      }
+
+      // Create the prompt purchase record with the PayPal order ID
       const { data: purchaseData, error: purchaseError } = await supabase
         .from('prompt_purchases')
         .insert({
@@ -62,7 +67,8 @@ export function PromptPurchaseModal({
           seller_id: seller.id,
           payment_status: 'paid',
           payment_amount: prompt.price,
-          payment_date: new Date().toISOString()
+          payment_date: new Date().toISOString(),
+          paypal_order_id: orderID
         })
         .select()
         .single();
