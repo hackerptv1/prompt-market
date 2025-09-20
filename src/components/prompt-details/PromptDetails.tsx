@@ -18,23 +18,46 @@ interface PromptDetailsProps {
   prompt: Prompt;
 }
 
+
 // Helper to get signed URL for a file in a private bucket
 async function getSignedUrl(bucket: 'prompt-media' | 'prompt-files', path: string): Promise<string> {
   if (!path) return '';
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  
   // Use the full path as stored (including user ID)
   const fullPath = path;
-  console.log('fullPath', fullPath);
+  
   try {
     const { data, error } = await supabase.storage.from(bucket).createSignedUrl(fullPath, 3600);
-    if (!error && data?.signedUrl) return data.signedUrl;
-  } catch {}
-  // Fallback: try public URL
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  if (supabaseUrl) {
-    return `${supabaseUrl}/storage/v1/object/public/${bucket}/${fullPath}`;
+    
+    if (error) {
+      console.error('getSignedUrl: Error creating signed URL:', error);
+      // Try public URL fallback immediately
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      if (supabaseUrl) {
+        const publicUrl = `${supabaseUrl}/storage/v1/object/public/${bucket}/${fullPath}`;
+        return publicUrl;
+      }
+      return '';
+    }
+    
+    if (data?.signedUrl) {
+      return data.signedUrl;
+    }
+  } catch (err) {
+    console.error('getSignedUrl: Exception creating signed URL:', err);
   }
   
+  // Fallback: try public URL (for public buckets)
+  if (bucket === 'prompt-media' || bucket === 'prompt-files') {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    if (supabaseUrl) {
+      const publicUrl = `${supabaseUrl}/storage/v1/object/public/${bucket}/${fullPath}`;
+      return publicUrl;
+    }
+  }
+  
+  console.error('getSignedUrl: Failed to get URL for file:', fullPath);
   return '';
 }
 
@@ -136,29 +159,39 @@ export function PromptDetails({ prompt }: PromptDetailsProps) {
       const arr = await Promise.all(
         (prompt.fileUrls || []).map(async (url) => {
           let signedUrl = '';
+          
+          // For now, always try to get the URL (since bucket is public)
+          // In the future, this should be conditional on purchase status
           try {
             signedUrl = await getSignedUrl('prompt-files', url);
           } catch (err) {
             console.error('Error generating signed URL for file:', url, err);
           }
+          
+          // Extract file info from the URL
+          const fileName = url.split('/').pop() || 'File';
+          const fileExtension = fileName.split('.').pop() || '';
+          
           return {
-            name: url.split('/').pop() || 'File',
-            size: '',
+            name: url, // Keep full path for display name extraction
+            size: '', // Could be enhanced to get actual file size
             type: 'prompt' as 'prompt',
-            format: url.split('.').pop() || '',
-            url: signedUrl
+            format: fileExtension,
+            url: signedUrl // URL for download
           };
         })
       );
+      
       if (isMounted) setSignedFiles(arr);
       setIsLoadingFiles(false);
     }
     fetchSignedMedia();
     fetchSignedFiles();
+    
     return () => {
       isMounted = false;
     };
-  }, [prompt.media_urls, prompt.fileUrls]);
+  }, [prompt.media_urls, prompt.fileUrls, hasPurchased]);
 
   const handlePurchaseClick = () => {
     if (!user) {
@@ -298,7 +331,11 @@ export function PromptDetails({ prompt }: PromptDetailsProps) {
               {isLoadingFiles ? (
                 <div className="text-gray-400 text-center py-6">Loading files...</div>
               ) : signedFiles.length > 0 ? (
-                <IncludedFiles files={signedFiles} />
+                <IncludedFiles 
+                  files={signedFiles} 
+                  hasPurchased={hasPurchased}
+                  onPurchaseClick={handlePurchaseClick}
+                />
               ) : (
                 <div className="text-gray-400 text-center py-6">No files available</div>
               )}
@@ -325,7 +362,11 @@ export function PromptDetails({ prompt }: PromptDetailsProps) {
               {isLoadingFiles ? (
                 <div className="text-gray-400 text-center py-6">Loading files...</div>
               ) : signedFiles.length > 0 ? (
-                <IncludedFiles files={signedFiles} />
+                <IncludedFiles 
+                  files={signedFiles} 
+                  hasPurchased={hasPurchased}
+                  onPurchaseClick={handlePurchaseClick}
+                />
               ) : (
                 <div className="text-gray-400 text-center py-6">No files available</div>
               )}

@@ -165,6 +165,7 @@ export function usePrompt(id: string | undefined) {
           sales: 0,
           thumbnail: promptData.thumbnail || DEFAULT_PLACEHOLDER_IMAGE,
           media_urls: promptData.media_urls || [],
+          fileUrls: fileUrls, // Map prompt_file_urls to fileUrls
           media_links: promptData.media_links || [],
           author: {
             id: promptData.seller_id || '',
