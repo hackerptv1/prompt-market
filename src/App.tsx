@@ -12,6 +12,7 @@ import { AuthPage } from './pages/AuthPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { AdminPage } from './pages/AdminPage';
 import { AboutUsPage } from './pages/AboutUsPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import { SellersPage } from './components/admin/sellers/SellersPage';
 import { PromptsPage } from './components/admin/prompts/PromptsPage';
 import { UsersPage } from './components/admin/users/UsersPage';
@@ -91,6 +92,7 @@ export default function App() {
                   <Route index element={<HomePage />} />
                   <Route path="browse" element={<BrowsePrompts />} />
                   <Route path="about" element={<AboutUsPage />} />
+                  <Route path="privacy" element={<PrivacyPolicyPage />} />
                   <Route path="prompt/:id" element={<PromptDetailsPage />} />
                   
                   {/* Seller routes - protected with seller role */}

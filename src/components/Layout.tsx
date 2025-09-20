@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Menu, Calendar, Search } from 'lucide-react';
 import { Logo } from './Logo';
@@ -12,7 +12,7 @@ import { useConsultationBookings } from '../hooks/useConsultationBookings';
 export function Layout() {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user } = useAuth();
+  useAuth();
   const { isAuthenticated, isSeller, isAdmin, canAccessSellerFeatures } = usePermissions();
   const { getUpcomingBookings } = useConsultationBookings({
     includeSellerInfo: false
@@ -143,12 +143,12 @@ export function Layout() {
               >
                 About Us
               </Link>
-              <a 
-                href="#" 
+              <Link 
+                to="/privacy" 
                 className="text-gray-500 hover:text-blue-600 transition-colors font-medium"
               >
                 Privacy Policy
-              </a>
+              </Link>
               <a 
                 href="#" 
                 className="text-gray-500 hover:text-blue-600 transition-colors font-medium"
